@@ -10,33 +10,35 @@ import (
 
 // Client is struct of AWS X-Ray client for tracing.
 type Client struct {
-	conf Config
+	conf  Config
+	trace *xray.XRay
 }
 
-// NewClient returns initialized *Client.
-func NewClient(conf Config) *Client {
-	return &Client{
-		conf: conf,
-	}
-}
-
-// NewTrace creates xray.Trace
-// and run background daemon sends bulk of segment data.
-func (c *Client) NewTrace(ctx context.Context) (platform.Trace, error) {
-	conf := c.conf
-	tr, err := xray.New(conf.ToConfig())
+// NewClient returns initialized *Client
+// with running background daemon sends bulk of segment data.
+func NewClient(conf Config) (*Client, error) {
+	cli, err := xray.New(conf.ToConfig())
 	if err != nil {
 		return nil, err
 	}
+
 	if conf.SamplingFraction != 0.0 && conf.SamplingQPS != 0.0 {
-		err = tr.SetSamplingPolicy(conf.SamplingFraction, conf.SamplingQPS)
+		err = cli.SetSamplingPolicy(conf.SamplingFraction, conf.SamplingQPS)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	tr.RunDaemon(conf.CheckpointSize, conf.CheckpointInterval)
+	cli.RunDaemon(conf.CheckpointSize, conf.CheckpointInterval)
+	return &Client{
+		conf:  conf,
+		trace: cli,
+	}, nil
+}
+
+// NewTrace returns initialized Trace.
+func (c *Client) NewTrace(_ context.Context) (platform.Trace, error) {
 	return &Trace{
-		Trace: tr,
+		Trace: c.trace,
 	}, nil
 }
