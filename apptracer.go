@@ -31,8 +31,9 @@ func (a *AppTracer) AddClient(c PlatformClient) {
 // when pass the same context.
 func (a *AppTracer) Trace(ctx context.Context) *TraceWrapper {
 	switch {
-	case !a.Config.Enable,
-		ctx == nil:
+	case ctx == nil,
+		a == nil,
+		!a.Config.Enable:
 		return &TraceWrapper{}
 	}
 
