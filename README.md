@@ -167,13 +167,14 @@ func childFunction3(ctx context.Context) error {
 
 - Google Stackdriver trace
 - AWS X-Ray
+- LightStep
 
 ## TODO
 
 - Supports microservices tracing
 - Supports other platforms
     - New Relic
-    - LightStep
+	- Datadog
 
 # Whats For?
 
