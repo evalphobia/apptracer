@@ -26,7 +26,7 @@ apptracer
 [21]: https://bettercodehub.com/edge/badge/evalphobia/apptracer?branch=master
 [22]: https://bettercodehub.com/
 
-`apptracer` is multiple trace system wrapper for Stackdriver Trace and AWS X-Ray.
+`apptracer` is multiple trace system wrapper for Stackdriver Trace, AWS X-Ray and LightStep.
 
 # Usage
 
@@ -34,6 +34,7 @@ apptracer
 import (
 	"github.com/evalphobia/apptracer"
 	"github.com/evalphobia/apptracer/platform/localdebug"
+	"github.com/evalphobia/apptracer/platform/lightstep"
 	"github.com/evalphobia/apptracer/platform/stackdriver"
 	"github.com/evalphobia/apptracer/platform/xray"
 )
@@ -58,6 +59,13 @@ func Init() {
 		})
 		tracer.AddClient(localCli)
 	}
+
+	// add LightStep
+	lsCli := lightstep.NewClient(lightstep.Config{
+		AccessToken: "<LightStep access token>",
+		ServiceName: "stage-my-cool-app",
+	})
+	tracer.AddClient(lsCli)
 
 	// add stackdriver trace
 	sdCli = stackdriver.NewClient(stackdriver.Config{
