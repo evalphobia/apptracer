@@ -30,3 +30,9 @@ func NewExporter(ctx context.Context, conf Config, projectID string) (*Exporter,
 func (e *Exporter) Flush() {
 	e.Exporter.Flush()
 }
+
+// Close closes client.
+func (e *Exporter) Close() {
+	e.Exporter.Flush()
+	e.Exporter.StopMetricsExporter()
+}

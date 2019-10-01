@@ -31,3 +31,8 @@ func NewExporter(ctx context.Context) (*Exporter, error) {
 func (e *Exporter) Flush() {
 	e.Exporter.Flush()
 }
+
+// Close closes client.
+func (e *Exporter) Close() {
+	_ = e.Exporter.Close()
+}

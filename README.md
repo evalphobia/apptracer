@@ -35,8 +35,9 @@ import (
 	"github.com/evalphobia/apptracer"
 	"github.com/evalphobia/apptracer/platform/localdebug"
 	"github.com/evalphobia/apptracer/platform/lightstep"
-	"github.com/evalphobia/apptracer/platform/stackdriver"
-	"github.com/evalphobia/apptracer/platform/xray"
+	"github.com/evalphobia/apptracer/platform/opencensus/datadog"
+	"github.com/evalphobia/apptracer/platform/opencensus/xray"
+	"github.com/evalphobia/apptracer/platform/opencensus/stackdriver"
 )
 
 // global singleton tracer.
@@ -67,42 +68,43 @@ func Init() {
 	})
 	tracer.AddClient(lsCli)
 
-	// add stackdriver trace
-	sdCli = stackdriver.NewClient(stackdriver.Config{
-		// auth setting
-		PrivateKey: "<GCP private key>",
-		Email:      "<GCP email address>",
-		// Filename: "/path/to/pem.json", //
+	// add opencensus trace
+	{
+		// datadog (installed agent is needed)
+		ddExp, err := datadog.NewExporter(context.Background(), "my-cool-app")
+		if err != nil {
+			panic(err)
+		}
 
-		// sampling setting
-		SamplingFraction: 0.5,   // sampling rate => 50%
-		SamplingQPS:      100.0, // max late => 100 req/s
+		// stackdriver trace
+		projectID := "test-morikawa"
+		sdExp, err := stackdriver.NewExporter(context.Background(), stackdriver.Config{
+			// auth setting
+			PrivateKey: "<GCP private key>",
+			Email:      "<GCP email address>",
+			// Filename: "/path/to/pem.json",
+		}, "<GCP projectID>")
+		if err != nil {
+			panic(err)
+		}
 
-		// stackdriver trace can only filter by URI(name),
-		// so adding prefix can make difference between other service or environment in same projectID.
-		Prefix: "stage-my-cool-app",
-	}, "<GCP projectID>")
-	tracer.AddClient(sdCli)
+		// aws xray trace
+		xrayExp, err := xray.NewExporter(context.Background())
 
-	// add aws xray trace
-	xrayCli := xray.NewClient(xray.Config{
-		AccessKey:        "<AWS access key>",
-		SecretKey:        "<AWS secret key>",
-		Region:           "<AWS region>",
+		ocCli := opencensus.NewClient(ddExp, sdExp, xrayExp)
+		opencensus.SetSamplingRate(1) // 100%
+		tracer.AddClient(ocCli)
+	}
 
-		// sampling setting
-		SamplingFraction: 0.5,
-		SamplingQPS:      10.0,
-
-		// client sends span data on each checkpoint,
-		CheckpointSize:     10,
-		CheckpointInterval: 1*time.Second,
-	})
-	tracer.AddClient(xrayCli)
+	tracer.Flush()
 }
 
 func MainFunction(ctx context.Context, r *http.Request) {
     // Before use tracer and get span, you have to call Init() to initialzed tracer.
+
+	// defer tracer.Close()
+	defer tracer.Flush()
+
 
 	span := tracer.Trace(ctx).NewRootSpanFromRequest(r)
 	defer func(){
@@ -165,8 +167,10 @@ func childFunction3(ctx context.Context) error {
 
 ## Supported Platform
 
-- Google Stackdriver trace
-- AWS X-Ray
+- OpenCensus
+	- Datadog trace
+	- Google Stackdriver trace
+	- AWS X-Ray
 - LightStep
 
 ## TODO
@@ -174,7 +178,6 @@ func childFunction3(ctx context.Context) error {
 - Supports microservices tracing
 - Supports other platforms
     - New Relic
-	- Datadog
 
 # Whats For?
 

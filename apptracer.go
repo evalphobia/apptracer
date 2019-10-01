@@ -59,4 +59,18 @@ func (a *AppTracer) Trace(ctx context.Context) *TraceWrapper {
 	return t
 }
 
+// Flush waits for exported data to be uploaded.
+func (a *AppTracer) Flush() {
+	for _, cli := range a.ClientList {
+		cli.Flush()
+	}
+}
+
+// Close closes all of the clients.
+func (a *AppTracer) Close() {
+	for _, cli := range a.ClientList {
+		cli.Close()
+	}
+}
+
 type traceKey struct{} // used to get TraceWrapper from context.

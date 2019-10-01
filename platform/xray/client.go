@@ -42,3 +42,9 @@ func (c *Client) NewTrace(_ context.Context) (platform.Trace, error) {
 		Trace: c.trace,
 	}, nil
 }
+
+// Flush is dummy method.
+func (*Client) Flush() {}
+
+// Close is dummy method.
+func (*Client) Close() {}
