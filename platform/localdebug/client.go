@@ -30,3 +30,9 @@ func (c *Client) NewTrace(ctx context.Context) (platform.Trace, error) {
 		logger: c.conf.Logger,
 	}, nil
 }
+
+// Flush is dummy method.
+func (*Client) Flush() {}
+
+// Close is dummy method.
+func (*Client) Close() {}

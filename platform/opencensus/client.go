@@ -13,6 +13,8 @@ import (
 type Exporter interface {
 	// Flush waits for exported data to be uploaded.
 	Flush()
+	// Close closes client.
+	Close()
 }
 
 // Client is a trace client for OpenCensus.
@@ -42,6 +44,13 @@ func (c *Client) NewTrace(ctx context.Context) (platform.Trace, error) {
 func (c *Client) Flush() {
 	for _, e := range c.Exporters {
 		e.Flush()
+	}
+}
+
+// Close closes all of clients.
+func (c *Client) Close() {
+	for _, e := range c.Exporters {
+		e.Close()
 	}
 }
 
