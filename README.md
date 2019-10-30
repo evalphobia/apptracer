@@ -169,15 +169,16 @@ func childFunction3(ctx context.Context) error {
 
 - OpenCensus
 	- Datadog trace
-	- Google Stackdriver trace
-	- AWS X-Ray
+        - Google Stackdriver trace
+        - New Relic
+        - AWS X-Ray
 - LightStep
 
 ## TODO
 
 - Supports microservices tracing
 - Supports other platforms
-    - New Relic
+
 
 # Whats For?
 
