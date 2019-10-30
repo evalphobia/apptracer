@@ -1,8 +1,6 @@
 package datadog
 
 import (
-	"context"
-
 	datadog "github.com/DataDog/opencensus-go-exporter-datadog"
 	"go.opencensus.io/trace"
 )
@@ -13,7 +11,7 @@ type Exporter struct {
 }
 
 // NewExporter returns initialized *Exporter.
-func NewExporter(ctx context.Context, name string) (*Exporter, error) {
+func NewExporter(name string) (*Exporter, error) {
 	exp, err := datadog.NewExporter(
 		datadog.Options{
 			Service: name,
