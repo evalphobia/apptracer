@@ -1,8 +1,6 @@
 package xray
 
 import (
-	"context"
-
 	"contrib.go.opencensus.io/exporter/aws"
 	"go.opencensus.io/trace"
 )
@@ -13,7 +11,7 @@ type Exporter struct {
 }
 
 // NewExporter returns initialized *Exporter.
-func NewExporter(ctx context.Context) (*Exporter, error) {
+func NewExporter() (*Exporter, error) {
 	exp, err := aws.NewExporter(
 		aws.WithVersion("latest"),
 	)
