@@ -12,11 +12,14 @@ type Exporter struct {
 
 // NewExporter returns initialized *Exporter.
 func NewExporter(name string) (*Exporter, error) {
-	exp, err := datadog.NewExporter(
-		datadog.Options{
-			Service: name,
-		},
-	)
+	return NewExporterWithOptions(datadog.Options{
+		Service: name,
+	})
+}
+
+// NewExporterWithOptions returns initialized *Exporter.
+func NewExporterWithOptions(opts datadog.Options) (*Exporter, error) {
+	exp, err := datadog.NewExporter(opts)
 	if err != nil {
 		return nil, err
 	}
