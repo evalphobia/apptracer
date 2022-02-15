@@ -12,19 +12,9 @@ type Exporter struct {
 
 // NewExporter returns initialized *Exporter.
 func NewExporter(name string) (*Exporter, error) {
-	exp, err := datadog.NewExporter(
-		datadog.Options{
-			Service: name,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	trace.RegisterExporter(exp)
-
-	return &Exporter{
-		Exporter: exp,
-	}, nil
+	return NewExporterWithOptions(datadog.Options{
+		Service: name,
+	})
 }
 
 // NewExporterWithOptions returns initialized *Exporter.
